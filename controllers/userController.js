@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Doctor = require("../models/doctorModel");
 const Appointment = require("../models/appointmentModel");
+const cloudinary = require('cloudinary');
 
 const getuser = async (req, res) => {
   try {
@@ -47,18 +48,27 @@ const login = async (req, res) => {
     );
     return res.status(201).send({ msg: "User logged in successfully", token });
   } catch (error) {
-    res.status(500).send("Unable to login user",error);
+    res.status(500).send("Unable to login user", error);
   }
 };
-
 const register = async (req, res) => {
+  const myCloud = await cloudinary.v2.uploader.upload(req.body.avatar, {
+    folder: "avatars",
+    width: 150,
+    crop: "scale"
+  });
   try {
     const emailPresent = await User.findOne({ email: req.body.email });
     if (emailPresent) {
       return res.status(400).send("Email already exists");
     }
     const hashedPass = await bcrypt.hash(req.body.password, 10);
-    const user = await User({ ...req.body, password: hashedPass });
+    const user = await User({
+      ...req.body, password: hashedPass, avatar: {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url
+      }
+    });
     const result = await user.save();
     if (!result) {
       return res.status(500).send("Unable to register user");

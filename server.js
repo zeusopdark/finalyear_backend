@@ -1,8 +1,14 @@
 require("dotenv").config();
-const mongoose=require('mongoose');
+const mongoose = require('mongoose');
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const cloudinary = require('cloudinary');
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+})
 // require("../HealthBooker/db/conn");
 const userRouter = require("./routes/userRoutes");
 const doctorRouter = require("./routes/doctorRoutes");
@@ -24,7 +30,7 @@ mongoose.connect("mongodb+srv://ankit:zeusdark@cluster0.qbv9zzo.mongodb.net/Fina
 mongoose.connection.once('open', () => {
     console.log('Connected to MongoDB')
     app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`))
-  
+
 });
 mongoose.connection.on('error', err => {
     console.log(err);

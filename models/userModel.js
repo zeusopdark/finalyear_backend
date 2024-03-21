@@ -50,10 +50,15 @@ const schema = mongoose.Schema(
       type: String,
       default: "pending",
     },
-    pic: {
-      type: String,
-      default:
-        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+    avatar: {
+      public_id: {
+        type: String,
+        required: true
+      },
+      url: {
+        type: String,
+        required: true
+      }
     },
   },
   {
