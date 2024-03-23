@@ -17,7 +17,6 @@ const appointRouter = require("./routes/appointRoutes");
 const notificationRouter = require("./routes/notificationRouter");
 
 const app = express();
-console.log(process.env.MONGO_URL);
 // client();
 app.use(cors());
 app.use(express.json());

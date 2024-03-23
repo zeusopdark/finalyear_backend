@@ -26,7 +26,6 @@ const getallusers = async (req, res) => {
 };
 
 const login = async (req, res) => {
-  console.log(process.env.JWT_SECRET);
   try {
     const emailPresent = await User.findOne({ email: req.body.email });
     if (!emailPresent) {

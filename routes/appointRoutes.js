@@ -15,6 +15,11 @@ appointRouter.post(
   auth,
   appointmentController.bookappointment
 );
+appointRouter.get(
+  "/generateMeetingId",
+  auth,
+  appointmentController.generateMeetingId
+)
 
 appointRouter.put("/completed", auth, appointmentController.completed);
 
