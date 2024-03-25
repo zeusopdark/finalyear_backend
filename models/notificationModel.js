@@ -15,6 +15,9 @@ const schema = mongoose.Schema(
       type: String,
       default: "",
     },
+    meetingUserId: {
+      type: String,
+    }
   },
   {
     timestamps: true,

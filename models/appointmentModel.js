@@ -24,6 +24,9 @@ const schema = mongoose.Schema(
       type: String,
       default: "Pending",
     },
+    meetingId: {
+      type: String,
+    }
   },
   {
     timestamps: true,

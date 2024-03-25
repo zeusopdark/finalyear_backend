@@ -1,7 +1,6 @@
 const Appointment = require("../models/appointmentModel");
 const Notification = require("../models/notificationModel");
 const User = require("../models/userModel");
-
 const getallappointments = async (req, res) => {
   try {
     const keyword = req.query.search
@@ -53,21 +52,15 @@ const bookappointment = async (req, res) => {
 };
 
 const completed = async (req, res) => {
+  console.log("You hit me");
   try {
+    const alreadyCompleted = await Appointment.findById(req.body.appointid);
 
-    const alreadyFound = await Appointment.findOneAndUpdate(
-      { _id: req.body.appointid },
-      { status: "Completed" }
-    );
-
-    if (alreadyFound) {
+    if (alreadyCompleted.status === "Completed") {
       return res.status(200).json({ success: true, message: "Already completed" })
     }
-    // Find the notification based on userId
+
     const impData = await Appointment.findById(req.body.appointid);
-
-
-    // Create notification for user
     const user = await User.findById(req.locals);
     const usernotification = new Notification({
       userId: impData.userId,
@@ -76,15 +69,14 @@ const completed = async (req, res) => {
 
     await usernotification.save();
 
-    // Find the user based on req.locals (assuming it's the user id)
-
-    // Create notification for doctor
     const doctornotification = new Notification({
       userId: req.body.doctorId,
       content: `Your appointment with ${req.body.doctorname} has been completed`,
     });
 
     await doctornotification.save();
+    alreadyCompleted.status = "Completed"
+    await alreadyCompleted.save();
 
     return res.status(201).send("Appointment completed");
   } catch (error) {
@@ -94,21 +86,67 @@ const completed = async (req, res) => {
 };
 
 const generateMeetingId = async (req, res) => {
-  const userId = req.locals;
+  try {
+    const appointment = await Appointment.findById(req.body.appointid);
 
-  const timestamp = Date.now();
+    if (appointment.meetingId) {
+      return res.status(200).json({ meetingId: appointment.meetingId });
+    }
 
-  // Combine doctor's ID and timestamp to generate a unique meeting ID
-  const meetingId = `${userId}_${timestamp}`;
+    const timestamp = Date.now();
 
-  // You can return the meeting ID in the response or use it further as needed
-  return res.status(200).json({ meetingId });
+    const meetingId = `${req.body.appointid}_${timestamp}`;
+    appointment.meetingId = meetingId;
 
+    await appointment.save();
+    const userIds = appointment.doctorId;
+    const doc = await User.findById(userIds);
+
+
+    const usernotification = new Notification({
+      userId: appointment.userId,
+      content: `Dr. ${doc.firstname} ${doc.lastname} has joined the meeting. Meeting ID: ${meetingId}`,
+    });
+
+    await usernotification.save();
+
+    return res.status(200).json({ meetingId });
+  } catch (error) {
+
+    console.error("Error generating meeting ID:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const checkMeetingId = async (req, res) => {
+
+  const id = req.body.meetingId;
+  const appointmentId = id.split("_")[0]; // Extract the appointment ID from the meeting ID
+
+  try {
+    const appointment = await Appointment.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "No meetingId Present" });
+    }
+
+    // Check if the appointment's _id matches the extracted appointment ID
+    if (appointment._id.toString() === appointmentId) {
+      return res.status(200).json({ success: true, message: "Successful" });
+    } else {
+      return res.status(404).json({ success: false, message: "Invalid meetingId" });
+    }
+  } catch (error) {
+    console.error("Error checking meeting ID:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
+  }
 }
+
 
 module.exports = {
   getallappointments,
   bookappointment,
   completed,
-  generateMeetingId
+  generateMeetingId,
+  checkMeetingId
 };
