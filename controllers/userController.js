@@ -8,7 +8,8 @@ const cloudinary = require('cloudinary');
 const getuser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
-    return res.send(user);
+    console.log(user);
+    return res.status(200).send(user);
   } catch (error) {
     res.status(500).send("Unable to get user");
   }
