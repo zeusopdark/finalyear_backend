@@ -12,6 +12,10 @@ const schema = mongoose.Schema(
       ref: "User",
       required: true,
     },
+    payment: {
+      type: String,
+      default: "Unsuccessful"
+    },
     date: {
       type: String,
       required: true,

@@ -44,7 +44,7 @@ const bookappointment = async (req, res) => {
     await doctornotification.save();
 
     const result = await appointment.save();
-    return res.status(201).send(result);
+    return res.status(201).json({ message: "Redirecting to Payment Gateway", success: true, result });
   } catch (error) {
     console.log("error", error);
     res.status(500).send("Unable to book appointment");

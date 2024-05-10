@@ -19,7 +19,11 @@ const schema = mongoose.Schema(
       type: Number,
       required: true,
     },
-   
+    totalEarning: {
+      type: String,
+      default: 0
+    },
+
     isDoctor: {
       type: Boolean,
       default: false,
