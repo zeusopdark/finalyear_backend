@@ -103,7 +103,7 @@ const paymentVerification = async (req, res, next) => {
             // Update appointment status
             await Appointment.findByIdAndUpdate(appointmentId, { payment: "Successful" }, { new: true });
 
-            res.redirect("https://final-year-frontend.onrender.com/doctors")
+            res.redirect("https://final-year-frontend.onrender.com")
 
         } else {
             // Invalid signature, delete appointment and send error response
